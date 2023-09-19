@@ -3,11 +3,10 @@ package controller
 import (
 	"net/http"
 
-	"golang.org/x/crypto/bcrypt"
-
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/bootstrap"
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/domain"
 	"github.com/gin-gonic/gin"
+	"github.com/pws-backend/bootstrap"
+	"github.com/pws-backend/domain"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type LoginController struct {
@@ -29,7 +28,6 @@ func (lc *LoginController) Login(c *gin.Context) {
 		c.JSON(http.StatusNotFound, domain.ErrorResponse{Message: "User not found with the given email"})
 		return
 	}
-
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)) != nil {
 		c.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: "Invalid credentials"})
 		return

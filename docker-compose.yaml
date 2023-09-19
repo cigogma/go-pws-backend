@@ -4,28 +4,25 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: app
-    container_name: app
+      dockerfile: dev.Dockerfile
+    image: web
+    container_name: web
     restart: unless-stopped
     env_file: .env
     ports:
       - "$PORT:$PORT"
     depends_on:
-      - mongodb
-
-  mongodb:
-    image: mongo:6.0
-    container_name: mongodb
+      - mysql
+    volumes:
+      - ./:/app
+  mysql:
+    image: mysql:8.0.31
+    container_name: mysql
     restart: unless-stopped
-    env_file: .env
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=$DB_USER
-      - MONGO_INITDB_ROOT_PASSWORD=$DB_PASS
+      MYSQL_ROOT_PASSWORD: $DB_PASS
+      MYSQL_DATABASE: $DB_SCHEMA
     ports:
       - "$DB_PORT:$DB_PORT"
-    volumes:
-      - dbdata:/data/db
-
 volumes:
   dbdata:

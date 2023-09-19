@@ -4,26 +4,29 @@ import (
 	"context"
 	"time"
 
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/domain"
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/internal/tokenutil"
+	"github.com/pws-backend/domain"
+	"github.com/pws-backend/internal/tokenutil"
+	"gorm.io/gorm"
 )
 
 type loginUsecase struct {
-	userRepository domain.UserRepository
+	db             *gorm.DB
 	contextTimeout time.Duration
 }
 
-func NewLoginUsecase(userRepository domain.UserRepository, timeout time.Duration) domain.LoginUsecase {
+func NewLoginUsecase(db *gorm.DB, timeout time.Duration) domain.LoginUsecase {
 	return &loginUsecase{
-		userRepository: userRepository,
+		db:             db,
 		contextTimeout: timeout,
 	}
 }
 
 func (lu *loginUsecase) GetUserByEmail(c context.Context, email string) (domain.User, error) {
-	ctx, cancel := context.WithTimeout(c, lu.contextTimeout)
+	_, cancel := context.WithTimeout(c, lu.contextTimeout)
 	defer cancel()
-	return lu.userRepository.GetByEmail(ctx, email)
+	var result = domain.User{Email: email}
+	err := lu.db.First(&result).Error
+	return result, err
 }
 
 func (lu *loginUsecase) CreateAccessToken(user *domain.User, secret string, expiry int) (accessToken string, err error) {

@@ -6,11 +6,11 @@ import (
 
 type JwtCustomClaims struct {
 	Name string `json:"name"`
-	ID   string `json:"id"`
+	ID   uint   `json:"id"`
 	jwt.StandardClaims
 }
 
 type JwtCustomRefreshClaims struct {
-	ID string `json:"id"`
+	ID uint `json:"id"`
 	jwt.StandardClaims
 }

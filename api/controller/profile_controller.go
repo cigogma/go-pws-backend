@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/domain"
 	"github.com/gin-gonic/gin"
+	"github.com/pws-backend/domain"
 )
 
 type ProfileController struct {
@@ -12,7 +12,7 @@ type ProfileController struct {
 }
 
 func (pc *ProfileController) Fetch(c *gin.Context) {
-	userID := c.GetString("x-user-id")
+	userID := c.GetUint("x-user-id")
 
 	profile, err := pc.ProfileUsecase.GetProfileByID(c, userID)
 	if err != nil {

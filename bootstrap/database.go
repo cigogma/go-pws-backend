@@ -6,51 +6,45 @@ import (
 	"log"
 	"time"
 
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/mongo"
+	"github.com/pws-backend/domain"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-func NewMongoDatabase(env *Env) mongo.Client {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func NewDatabase(env *Env) *gorm.DB {
+	_, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	dbHost := env.DBHost
 	dbPort := env.DBPort
 	dbUser := env.DBUser
 	dbPass := env.DBPass
+	dbSchema := env.DBSchema
 
-	mongodbURI := fmt.Sprintf("mongodb://%s:%s@%s:%s", dbUser, dbPass, dbHost, dbPort)
+	databaseURI := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbSchema)
 
 	if dbUser == "" || dbPass == "" {
-		mongodbURI = fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort)
+		log.Fatal("Database user or password not set.")
 	}
 
-	client, err := mongo.NewClient(mongodbURI)
+	client, err := gorm.Open(mysql.Open(databaseURI), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	err = client.Connect(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Ping(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	client.AutoMigrate(&domain.User{})
+	client.AutoMigrate(&domain.Project{})
 	return client
 }
 
-func CloseMongoDBConnection(client mongo.Client) {
+func CloseDBConnection(client *gorm.DB) {
 	if client == nil {
 		return
 	}
-
-	err := client.Disconnect(context.TODO())
-	if err != nil {
-		log.Fatal(err)
+	sqlDB, err := client.DB()
+	if err == nil {
+		return
 	}
+	sqlDB.Close()
 
-	log.Println("Connection to MongoDB closed.")
+	log.Println("Connection to mySql closed.")
 }
