@@ -11,11 +11,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewSignupRouter(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, group *gin.RouterGroup) {
+func InitRouter(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, group *gin.RouterGroup) {
 	ur := repository.NewUserRepository(db)
-	sc := controller.SignupController{
-		SignupUsecase: usecase.NewSignupUsecase(ur, timeout),
+	sc := controller.AuthInitController{
+		SignupUsecase: usecase.AuthInitUseCase(ur, timeout),
 		Env:           env,
 	}
-	group.POST("/signup", sc.Signup)
+	group.POST("/auth/init", sc.Init)
 }

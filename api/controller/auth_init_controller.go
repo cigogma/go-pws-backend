@@ -9,12 +9,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type SignupController struct {
+type AuthInitController struct {
 	SignupUsecase domain.SignupUsecase
 	Env           *bootstrap.Env
 }
 
-func (sc *SignupController) Signup(c *gin.Context) {
+func (sc *AuthInitController) Init(c *gin.Context) {
 	var request domain.SignupRequest
 
 	err := c.ShouldBind(&request)
@@ -23,9 +23,9 @@ func (sc *SignupController) Signup(c *gin.Context) {
 		return
 	}
 
-	_, err = sc.SignupUsecase.GetUserByEmail(c, request.Email)
+	_, err = sc.SignupUsecase.CheckUserExists(c)
 	if err == nil {
-		c.JSON(http.StatusConflict, domain.ErrorResponse{Message: "User already exists with the given email"})
+		c.JSON(http.StatusConflict, domain.ErrorResponse{Message: "Autentication already initalized!"})
 		return
 	}
 

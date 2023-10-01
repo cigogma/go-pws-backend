@@ -22,9 +22,9 @@ func (ur *userRepository) Create(c context.Context, user *domain.User) error {
 	return err
 }
 
-func (ur *userRepository) Fetch(c context.Context) ([]domain.User, error) {
+func (ur *userRepository) Fetch(c context.Context, limit int) ([]domain.User, error) {
 	var users []domain.User
-	err := ur.database.Find(&users).Error
+	err := ur.database.Limit(limit).Find(&users).Error
 	return users, err
 }
 

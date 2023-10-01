@@ -2,40 +2,48 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/pws-backend/domain"
 	"github.com/pws-backend/internal/tokenutil"
 )
 
-type signupUsecase struct {
+type authInitUsecase struct {
 	userRepository domain.UserRepository
 	contextTimeout time.Duration
 }
 
-func NewSignupUsecase(userRepository domain.UserRepository, timeout time.Duration) domain.SignupUsecase {
-	return &signupUsecase{
+func AuthInitUseCase(userRepository domain.UserRepository, timeout time.Duration) domain.SignupUsecase {
+	return &authInitUsecase{
 		userRepository: userRepository,
 		contextTimeout: timeout,
 	}
 }
 
-func (su *signupUsecase) Create(c context.Context, user *domain.User) error {
+func (su *authInitUsecase) Create(c context.Context, user *domain.User) error {
 	ctx, cancel := context.WithTimeout(c, su.contextTimeout)
 	defer cancel()
 	return su.userRepository.Create(ctx, user)
 }
 
-func (su *signupUsecase) GetUserByEmail(c context.Context, email string) (domain.User, error) {
+func (su *authInitUsecase) CheckUserExists(c context.Context) (*domain.User, error) {
 	ctx, cancel := context.WithTimeout(c, su.contextTimeout)
 	defer cancel()
-	return su.userRepository.GetByEmail(ctx, email)
+	users, err := su.userRepository.Fetch(ctx, 1)
+	if err != nil {
+		return nil, err
+	}
+	if len(users) == 0 {
+		return nil, errors.New("No user was found!")
+	}
+	return &users[0], nil
 }
 
-func (su *signupUsecase) CreateAccessToken(user *domain.User, secret string, expiry int) (accessToken string, err error) {
+func (su *authInitUsecase) CreateAccessToken(user *domain.User, secret string, expiry int) (accessToken string, err error) {
 	return tokenutil.CreateAccessToken(user, secret, expiry)
 }
 
-func (su *signupUsecase) CreateRefreshToken(user *domain.User, secret string, expiry int) (refreshToken string, err error) {
+func (su *authInitUsecase) CreateRefreshToken(user *domain.User, secret string, expiry int) (refreshToken string, err error) {
 	return tokenutil.CreateRefreshToken(user, secret, expiry)
 }

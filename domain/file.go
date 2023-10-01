@@ -1,10 +1,14 @@
 package domain
 
-import "gorm.io/gorm"
+import (
+	"context"
+
+	"gorm.io/gorm"
+)
 
 type File struct {
 	gorm.Model
-
+	ID           uint `json:"id" gorm:"primary_key"`
 	Key          string
 	Bucket       string
 	Mime         string
@@ -12,7 +16,14 @@ type File struct {
 	Comment      string
 }
 
-// Define a function to retrieve the URL for a File
-func (file *File) GetURL() string {
-	return "https://storage.googleapis.com/" + file.Bucket + "/" + file.Key
+type FileRepository interface {
+	Create(c context.Context, project *File) error
+	GetByID(c context.Context, projectId uint) (*File, error)
+	Fetch(c context.Context, limit int) ([]File, error)
+}
+
+type FileUsecase interface {
+	Create(c context.Context, project *File) error
+	GetByID(c context.Context, projectId uint) (*File, error)
+	Fetch(c context.Context, limit int) ([]File, error)
 }

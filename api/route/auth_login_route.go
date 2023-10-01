@@ -11,9 +11,9 @@ import (
 )
 
 func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, group *gin.RouterGroup) {
-	lc := &controller.LoginController{
+	lc := &controller.AuthLoginController{
 		LoginUsecase: usecase.NewLoginUsecase(db, timeout),
 		Env:          env,
 	}
-	group.POST("/login", lc.Login)
+	group.POST("/auth/login", lc.Login)
 }
