@@ -15,11 +15,11 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, gin *gin.Engi
 	InitRouter(env, timeout, db, publicRouter)
 	NewLoginRouter(env, timeout, db, publicRouter)
 	NewRefreshTokenRouter(env, timeout, db, publicRouter)
-	NewFileRouter(env, timeout, db, publicRouter)
-	NewFilesRouter(env, timeout, db, publicRouter)
+	NewProjectsRouter(env, timeout, db, publicRouter)
 	protectedRouter := gin.Group("")
 	// Middleware to verify AccessToken
 	protectedRouter.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
 	// All Private APIs
+	NewFilesRouter(env, timeout, db, publicRouter)
 	NewProfileRouter(env, timeout, db, protectedRouter)
 }

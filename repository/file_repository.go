@@ -22,14 +22,17 @@ func (ur *fileRepository) Create(c context.Context, file *domain.File) error {
 	return err
 }
 
+func (ur *fileRepository) Delete(c context.Context, file *domain.File) error {
+	return ur.database.Delete(file).Error
+}
 func (ur *fileRepository) Fetch(c context.Context, limit int) ([]domain.File, error) {
 	var files []domain.File
 	err := ur.database.Limit(limit).Find(&files).Error
 	return files, err
 }
 
-func (ur *fileRepository) GetByID(c context.Context, id uint) (domain.User, error) {
-	var user domain.User
-	err := ur.database.Model(domain.User{ID: id}).First(&user).Error
-	return user, err
+func (ur *fileRepository) GetByID(c context.Context, id uint) (domain.File, error) {
+	var file domain.File
+	err := ur.database.First(&file, id).Error
+	return file, err
 }

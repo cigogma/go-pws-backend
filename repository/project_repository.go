@@ -17,14 +17,14 @@ func NewProjectRepository(db *gorm.DB) domain.ProjectRepository {
 	}
 }
 
-func (ur *projectRepository) Create(c context.Context, user *domain.Project) error {
-	err := ur.database.Create(user).Error
+func (ur *projectRepository) Create(c context.Context, project *domain.Project) error {
+	err := ur.database.Create(project).Error
 	return err
 }
 
 func (ur *projectRepository) Fetch(c context.Context, limit int) ([]domain.Project, error) {
 	var users []domain.Project
-	err := ur.database.Limit(limit).Find(&users).Error
+	err := ur.database.Limit(limit).Preload("Thumbnail").Find(&users).Error
 	return users, err
 }
 

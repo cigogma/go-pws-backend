@@ -16,6 +16,7 @@ func NewProjectsRouter(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, g
 	pc := &controller.ProjectsController{
 		ProjectUsecase: usecase.NewProjectUsecase(ur, timeout),
 	}
+	//sadas
 	group.GET("/projects", pc.Index)
 	group.GET("/projects/:projectId", pc.Details)
 	group.PUT("/projects/:projectId", pc.Update)
